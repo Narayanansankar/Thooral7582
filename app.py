@@ -413,10 +413,7 @@ def submit_dispatch():
         
         if location_query and not found_locally:
             # Try Google API if not found locally
-            # ... (rest of API logic)
-            
-            # Try Google API if not found locally
-            if not found_locally and GOOGLE_MAPS_API_KEY and "YOUR_GOOGLE_MAPS_API_KEY" not in GOOGLE_MAPS_API_KEY:
+            if GOOGLE_MAPS_API_KEY and "YOUR_GOOGLE_MAPS_API_KEY" not in GOOGLE_MAPS_API_KEY:
                 try:
                     import requests
                     # Append 'Tamil Nadu' for context, but allow other districts/cities

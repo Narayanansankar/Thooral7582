@@ -136,13 +136,9 @@ class AIService:
                 return {"transcription": "", "priority": "P4", "skip": True}
 
             # 2. RMS Amplitude Check (Server-side VAD)
-            # WebM is complex to parse raw PCM, but we can do a heuristic check
-            # or just rely on the AI's "detected_language" filter
-            
-            # Simple heuristic: If AI detects "Unknown" language or empty text, ignore it.
-            # But let's try to pass it to Gemini first.
+            # WebM encoding makes raw PCM parsing complex without external libraries.
+            # We rely on the AI's "detected_language" filter to catch silence/noise.
 
-            
             # Send to Gemini with timeout handling
             logger.info(f"Processing audio chunk ({len(audio_bytes)} bytes)...")
             
