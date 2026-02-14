@@ -57,10 +57,10 @@ class TTSService:
 
             if language_code == "Tamil":
                 target_lang = "ta-IN"
-                voice_name = "ta-IN-Wavenet-B" # Male
+                voice_name = "ta-IN-Wavenet-D" # Female (Better quality)
             elif language_code == "Tanglish":
                 target_lang = "ta-IN" # Use Tamil voice for Tanglish
-                voice_name = "ta-IN-Wavenet-B"
+                voice_name = "ta-IN-Wavenet-D"
             
             # Prepare synthesis input
             synthesis_input = texttospeech.SynthesisInput(text=text)
@@ -74,7 +74,7 @@ class TTSService:
             # Select audio file type
             audio_config = texttospeech.AudioConfig(
                 audio_encoding=texttospeech.AudioEncoding.MP3,
-                speaking_rate=0.9 # Slightly slower for clarity
+                speaking_rate=1.0 # Natural speed
             )
 
             # Perform the text-to-speech request

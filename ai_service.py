@@ -189,7 +189,7 @@ class AIService:
                  logger.info(f"Blocked tiny transcription: '{transcription}'")
                  return {"transcription": "", "priority": "P4", "skip": True}
 
-            if detected and detected not in ["English", "Unknown"]:
+            if detected and detected != "Unknown":
                 self.last_detected_language = detected
                 logger.info(f"Language context updated to: {detected}")
 
