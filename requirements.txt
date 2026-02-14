@@ -1,0 +1,12 @@
+Flask 
+gspread 
+pandas 
+google-auth-oauthlib 
+flask-login 
+flask-wtf 
+Levenshtein 
+python-dateutil 
+gunicorn
+google-generativeai
+flask-socketio
+python-dotenv

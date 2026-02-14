@@ -1,0 +1,387 @@
+/* 
+   ==========================================================================
+   Modern CSS for Crime Analytics Dashboard with Light/Dark Theme Support
+   ==========================================================================
+*/
+
+/* --- CSS Variables for Theming --- */
+:root {
+    --primary-color: #005A9C;
+    --secondary-color: #FFC107;
+    --bg-main: #f4f7fa;
+    --bg-panel: #ffffff;
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --border-color: #e2e8f0;
+    --header-text: #ffffff;
+    --map-filter: none;
+}
+
+body.dark-mode {
+    --primary-color: #3182ce;
+    --secondary-color: #FFC107;
+    --bg-main: #1a202c;
+    --bg-panel: #2d3748;
+    --text-primary: #e2e8f0;
+    --text-secondary: #a0aec0;
+    --border-color: #4a5568;
+    --header-text: #e2e8f0;
+    --map-filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* --- Global Resets & Body --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- Header Section --- */
+.header {
+    background-color: var(--primary-color);
+    color: var(--header-text);
+    padding: 12px 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header > div:first-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.header p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* --- Header: Tab Switcher --- */
+.tab-switcher {
+    display: flex;
+    gap: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.tab-button {
+    background: transparent;
+    border: none;
+    color: var(--header-text);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    opacity: 0.8;
+}
+
+.tab-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+.tab-button.active {
+    background-color: var(--bg-panel);
+    color: var(--primary-color);
+    opacity: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* --- Header: Controls (Update, Theme, Logout) --- */
+.last-updated {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.last-updated .dot {
+    width: 10px;
+    height: 10px;
+    background-color: #38a169;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(56, 161, 105, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 161, 105, 0); }
+}
+
+.theme-toggle-button {
+    background: none;
+    border: 1px solid var(--header-text);
+    color: var(--header-text);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.theme-toggle-button:hover {
+    background-color: var(--header-text);
+    color: var(--primary-color);
+}
+
+.logout-button {
+    /* This style will apply to the button inside the form */
+    color: var(--header-text);
+    background-color: transparent;
+    border: 1px solid var(--header-text);
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    font-family: inherit; /* Ensure button uses the same font */
+    font-size: 0.9rem;   /* Match font size with other controls */
+    cursor: pointer;     /* Ensure cursor is a pointer */
+}
+
+.logout-button:hover {
+    background-color: var(--header-text);
+    color: var(--primary-color);
+}
+
+
+/* --- Main Container & Filter Panel --- */
+.container {
+    display: flex;
+    flex-grow: 1;
+    height: calc(100vh - 75px); /* Adjust based on header height */
+}
+
+.filter-panel {
+    width: 350px;
+    flex-shrink: 0;
+    background-color: var(--bg-panel);
+    padding: 20px;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-panel h2 {
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    margin: 0;
+}
+
+.filter-panel h4 {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* --- Filter Elements --- */
+.crime-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.filter-btn:hover {
+    background-color: var(--border-color);
+}
+
+.filter-btn.active {
+    background-color: var(--secondary-color);
+    color: #333;
+    border-color: #e6ac00;
+    font-weight: bold;
+}
+
+input[type="date"] {
+    padding: 8px;
+    border-radius: 4px;
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+#resetFilters {
+    width: 100%;
+    padding: 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+#resetFilters:hover {
+    background-color: #c82333;
+}
+
+/* --- Slim-Select Theming --- */
+.ss-main, .ss-multi-selected {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+}
+
+.ss-multi-selected .ss-values .ss-value {
+    background-color: var(--primary-color);
+    color: var(--header-text);
+}
+
+.ss-content {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+}
+
+.ss-content .ss-list .ss-option {
+    color: var(--text-secondary);
+}
+
+.ss-content .ss-list .ss-option:hover, .ss-content .ss-list .ss-option.ss-highlighted {
+    background-color: var(--primary-color);
+    color: var(--header-text);
+}
+
+/* --- Subdivision List --- */
+.subdivision-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.subdivision-list-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.subdivision-list-item:last-child {
+    border-bottom: none;
+}
+
+.subdivision-list-item:hover {
+    background-color: var(--bg-main);
+}
+
+.subdivision-list-item.active {
+    background-color: var(--primary-color);
+    color: var(--header-text);
+    font-weight: bold;
+}
+
+
+/* --- Analytics Panel --- */
+.analytics-panel {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.analytics-panel ul {
+    list-style-position: inside;
+    padding-left: 5px;
+}
+
+.analytics-panel li {
+    margin-bottom: 5px;
+}
+
+/* --- Map Section --- */
+#map {
+    flex-grow: 1;
+    height: 100%;
+    background-color: var(--bg-main);
+}
+
+.leaflet-tile-container {
+    filter: var(--map-filter);
+}
+
+.heatmap-options {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.boundary-label {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-weight: bold;
+    font-size: 13px;
+    color: #f0f0f0;
+    text-shadow: 0 0 3px #000, 0 0 3px #000, 0 0 3px #000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.label-hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+}

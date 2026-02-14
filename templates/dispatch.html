@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}RAPID-100 | Live Dispatch{% endblock %}
+
+{% block content %}
+<style>
+    /* RAPID-100 Specific Styles (Dark Future Theme) */
+    :root {
+        --rapid-bg: #0f172a;
+        --rapid-card: #1e293b;
+        --rapid-accent: #0ea5e9;
+        --rapid-danger: #ef4444;
+        --rapid-success: #22c55e;
+        --rapid-text: #f8fafc;
+        --rapid-text-dim: #94a3b8;
+    }
+
+    body.dark-mode {
+        background-color: var(--rapid-bg);
+        color: var(--rapid-text);
+    }
+
+    /* Force dark mode for this page if not set */
+    body {
+        background-color: var(--rapid-bg) !important;
+        color: var(--rapid-text) !important;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .header,
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .dispatch-grid {
+        display: grid;
+        grid-template-columns: 350px 1fr 350px;
+        gap: 20px;
+        padding: 20px;
+        height: calc(100vh - 80px);
+    }
+
+    .panel {
+        background: var(--rapid-card);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel h2 {
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--rapid-text-dim);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    /* Left Panel: Audio Control */
+    .audio-visualizer {
+        flex: 1;
+        background: #000;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    canvas#waveform {
+        width: 100%;
+        height: 100%;
+    }
+
+    .control-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 1rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-mic {
+        background: var(--rapid-accent);
+        color: white;
+    }
+
+    .btn-mic.listening {
+        background: var(--rapid-danger);
+        animation: pulse 1.5s infinite;
+    }
+
+    .btn-sim {
+        background: var(--rapid-card);
+        border: 1px solid var(--rapid-accent);
+        color: var(--rapid-accent);
+    }
+
+    .btn-sim:hover {
+        background: rgba(14, 165, 233, 0.1);
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    /* Center Panel: Transcript & AI Analysis */
+    .transcript-box {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        overflow-y: auto;
+        border-left: 3px solid var(--rapid-accent);
+        margin-bottom: 20px;
+    }
+
+    .ai-feedback {
+        background: rgba(14, 165, 233, 0.1);
+        border: 1px solid var(--rapid-accent);
+        padding: 15px;
+        border-radius: 8px;
+        color: var(--rapid-accent);
+    }
+
+    /* Right Panel: Triage Cards */
+    .triage-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .triage-label {
+        font-size: 0.8rem;
+        color: var(--rapid-text-dim);
+        text-transform: uppercase;
+    }
+
+    .triage-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .priority-p1 {
+        color: var(--rapid-danger);
+        border: 1px solid var(--rapid-danger);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        animation: flashRed 1s infinite alternate;
+    }
+
+    .priority-p2 {
+        color: #f97316;
+        border: 1px solid #f97316;
+    }
+
+    .priority-p3 {
+        color: #eab308;
+        border: 1px solid #eab308;
+    }
+
+    .priority-p4 {
+        color: var(--rapid-success);
+        border: 1px solid var(--rapid-success);
+    }
+
+    @keyframes flashRed {
+        from {
+            border-color: var(--rapid-danger);
+        }
+
+        to {
+            border-color: transparent;
+        }
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        background: #334155;
+        margin-left: auto;
+    }
+
+    .status-live {
+        background: var(--rapid-danger);
+        color: white;
+    }
+</style>
+
+<div class="header">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-satellite-dish fa-2x" style="color: var(--rapid-accent);"></i>
+            <div>
+                <h1 style="margin: 0; font-size: 1.5rem;">RAPID-100 <span
+                        style="font-size: 0.8rem; opacity: 0.7;">BETA</span></h1>
+                <p style="margin: 0; opacity: 0.6; font-size: 0.9rem;">Real-time AI Priority Incident Dispatch</p>
+            </div>
+        </div>
+        <div>
+            <span class="status-badge status-live">LIVE SYSTEM</span>
+        </div>
+    </div>
+</div>
+
+<div class="dispatch-grid">
+    <!-- Left: Inputs -->
+    <div class="panel">
+        <h2>Audio Input</h2>
+        <div class="audio-visualizer">
+            <canvas id="waveform"></canvas>
+        </div>
+        <button id="btn-mic" class="control-btn btn-mic">
+            <i class="fas fa-microphone"></i> Start Listening
+        </button>
+
+        <div style="margin-top: auto; display:none;">
+            <h3 style="font-size: 0.9rem; color: var(--rapid-text-dim); margin-bottom: 10px;">Simulation Scenarios</h3>
+            <button class="control-btn btn-sim" onclick="simulateCall('standard')">🔥 Fire (English)</button>
+            <button class="control-btn btn-sim" onclick="simulateCall('complex')">🚗 Accident (Tanglish)</button>
+            <button class="control-btn btn-sim" onclick="simulateCall('noisy')">📡 Bad Network</button>
+        </div>
+    </div>
+
+    <!-- Center: Transcript -->
+    <div class="panel">
+        <h2>Live Transcript</h2>
+        <div id="transcript" class="transcript-box">
+            <span style="opacity: 0.5;">Waiting for audio stream...</span>
+        </div>
+
+        <!-- Police Alert Banner -->
+        <div id="police-alert-banner"
+            style="display: none; background: var(--rapid-danger); color: white; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; animation: pulse 1s infinite; margin-bottom: 20px;">
+            <i class="fas fa-exclamation-triangle"></i> CRITICAL: POLICE ALERT TRIGGERED
+        </div>
+
+        <!-- Suggested Response Script -->
+        <div id="response-script-container" style="display: none; margin-top: auto;">
+            <h3 style="font-size: 0.9rem; color: var(--rapid-text-dim); margin-bottom: 5px; text-transform: uppercase;">
+                Suggested Response</h3>
+            <div class="ai-feedback" style="border-left: 4px solid var(--rapid-success); color: var(--rapid-text);">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <span id="script-text" style="font-size: 1.1rem; font-weight: 500;">...</span>
+                    <button onclick="speakResponse()"
+                        style="background: none; border: none; color: var(--rapid-success); cursor: pointer;"
+                        title="Read Aloud">
+                        <i class="fas fa-volume-up fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ai-suggestion" class="ai-feedback" style="display: none; margin-top: 10px;">
+            <strong><i class="fas fa-robot"></i> Dispatch Action:</strong>
+            <span id="suggestion-text">...</span>
+        </div>
+    </div>
+
+    <!-- Right: Triage -->
+    <div class="panel">
+        <h2>Auto-Triage</h2>
+
+        <div id="card-priority" class="triage-card" style="text-align: center;">
+            <div class="triage-label">Priority Level</div>
+            <div id="val-priority" class="triage-value">-</div>
+        </div>
+
+        <div class="triage-card">
+            <div class="triage-label">Incident Type</div>
+            <div id="val-type" class="triage-value">-</div>
+        </div>
+
+        <div class="triage-card">
+            <div class="triage-label">Location (Raw/Landmark)</div>
+            <div id="val-location" class="triage-value" style="font-size: 1rem;">-</div>
+        </div>
+
+        <div class="triage-card">
+            <div class="triage-label">Sentiment / Noise</div>
+            <div id="val-sentiment" class="triage-value" style="font-size: 0.9rem;">-</div>
+        </div>
+
+        <button id="btn-dispatch" class="control-btn btn-mic"
+            style="margin-top: auto; background-color: var(--rapid-success);">
+            <i class="fas fa-check"></i> Confirm Dispatch
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/dispatch.js') }}"></script>
+{% endblock %}

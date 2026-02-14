@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Crime Analytics{% endblock %}
+
+{% block content %}
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading Data...</p>
+</div>
+
+<header class="header">
+    <div>
+        <h1>Thoothukudi District Police</h1>
+        <p>Live Crime Analytics Dashboard</p>
+    </div>
+    <div class="tab-switcher">
+        <button class="tab-button active" data-sheet="100_calls_new">100 Calls</button>
+        <button class="tab-button" data-sheet="Robbrey-theft">Robbery/Theft</button>
+        <button class="tab-button" data-sheet="Hurt">Hurt</button>
+        <button class="tab-button" data-sheet="POCSO">POCSO</button>
+        <button class="tab-button" data-sheet="CCTV">CCTV</button>
+    </div>
+    <div class="header-controls">
+        <div id="last-updated-container" class="last-updated"></div>
+        <button id="export-map-btn" class="theme-toggle-button" title="Export Map as Image">
+            <i class="fas fa-camera"></i>
+        </button>
+        <button id="refresh-data-btn" class="theme-toggle-button" title="Refresh Current Tab">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <button id="theme-toggle" class="theme-toggle-button" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="filter-panel">
+        <h2>Filters</h2>
+        <div class="filter-section" id="crime-type-section" style="display: none;"><h4>Crime Type</h4><div id="crime-buttons-container" class="crime-buttons"><p>Loading...</p></div></div>
+        <div class="filter-section" id="date-range-section" style="display: none;"><h4>Date Range</h4><div class="date-filters"><label for="fromDate">From:</label> <input type="date" id="fromDate"><label for="toDate">To:</label> <input type="date" id="toDate"></div></div>
+        <div class="filter-section" id="subdivision-list-section" style="display: none;"><h4>Subdivision / Station (List)</h4><div id="subdivision-list-container" class="subdivision-list"><p>Loading list...</p></div></div>
+        <div class="filter-section" id="sub-category-section" style="display: none;"></div>
+        <div class="filter-section">
+            <h4>Map View</h4>
+            <div class="view-filters">
+                <label><input type="radio" name="mapView" value="point" checked> Point</label>
+                <label><input type="radio" name="mapView" value="cluster"> Cluster</label>
+                <label><input type="radio" name="mapView" value="heat"> Heat</label>
+            </div>
+            <div id="heatmap-options" class="heatmap-options" style="display: none;">
+                <label for="heatmap-radius">Intensity: <span id="radius-value">15</span></label>
+                <input type="range" id="heatmap-radius" min="10" max="19" value="15">
+            </div>
+        </div>
+        <button id="resetFilters">Reset All Filters</button>
+        <div class="analytics-panel filter-section"><h4>Live Analytics (Filtered)</h4><div id="analytics-container"><p>Apply filters to see stats.</p></div></div>
+    </div>
+    <div id="map"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.gridlayer.googlemutant@0.15.0/dist/Leaflet.GoogleMutant.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet-image@0.4.0/dist/leaflet-image.js"></script> <!-- THIS IS THE FIX -->
+    <script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}
